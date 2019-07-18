@@ -184,7 +184,7 @@ class SearchResults extends React.Component<ISearchResultsProps, ISearchResultsS
                   </span>
                 </li>
               </ul>
-              <div>
+              <div className="description">
                 {value.description}
               </div>
             </div>

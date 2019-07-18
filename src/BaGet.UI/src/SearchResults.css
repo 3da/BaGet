@@ -46,6 +46,10 @@
   white-space: nowrap;
 }
 
+.search-result .description {
+  white-space: pre-wrap;
+}
+
 .search-result .info span:not(:first-child){
   padding-left: 10px;
 }

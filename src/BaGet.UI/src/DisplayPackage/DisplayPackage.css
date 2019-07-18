@@ -7,6 +7,10 @@
   overflow-wrap: break-word;
 }
 
+.display-package .package-description {
+  white-space: pre-wrap;
+}
+
 .display-package h1 small {
   margin-left: 10px;
   font-size: 45%;

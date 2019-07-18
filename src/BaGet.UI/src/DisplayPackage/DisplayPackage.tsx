@@ -196,7 +196,7 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
             <InstallationInfo id={this.state.package.id} version={this.state.package.version} isDotnetTool={this.state.package.isDotnetTool} />
 
             {/* TODO: Fix this */}
-            <div dangerouslySetInnerHTML={{ __html: this.state.package.readme }} />
+            <div className="package-description" dangerouslySetInnerHTML={{ __html: this.state.package.readme }} />
 
             <Dependents packageId={this.id} />
             <Dependencies dependencyGroups={this.state.package.dependencyGroups} />
