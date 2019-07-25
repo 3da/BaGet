@@ -118,5 +118,15 @@ namespace BaGet.Extensions
 
             return routes;
         }
+
+        public static IRouteBuilder MapOtherRoutes(this IRouteBuilder routes)
+        {
+            routes.MapRoute(
+                name: "config",
+                template: "api/config",
+                defaults: new { controller = "Config", action = "Get" });
+
+            return routes;
+        }
     }
 }

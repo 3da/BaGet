@@ -5,10 +5,12 @@ import { Link } from 'react-router-dom';
 import timeago from 'timeago.js';
 import Dependencies from './Dependencies';
 import Dependents from './Dependents';
+import Examples from './Examples';
 import InstallationInfo from './InstallationInfo';
 import LicenseInfo from './LicenseInfo';
 import * as Registration from './Registration';
 import SourceRepository from './SourceRepository';
+
 
 import './DisplayPackage.css';
 
@@ -50,6 +52,7 @@ interface IPackageVersion {
 
 interface IDisplayPackageState {
   package?: IPackage;
+  config: any;
 }
 
 class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPackageState> {
@@ -73,7 +76,7 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
 
     this.id = props.match.params.id;
     this.version = props.match.params.version;
-    this.state = {package: undefined};
+    this.state = { package: undefined, config: null };
   }
 
   public componentWillUnmount() {
@@ -93,7 +96,7 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
 
       this.id = this.props.match.params.id;
       this.version = this.props.match.params.version;
-      this.setState({package: undefined});
+      this.setState({ package: undefined });
       this.componentDidMount();
     }
   }
@@ -101,7 +104,17 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
   public componentDidMount() {
     const url = `/v3/registration/${this.id}/index.json`;
 
-    fetch(url, {signal: this.registrationController.signal}).then(response => {
+    const getConfigUrl = '/api/config';
+
+    fetch(getConfigUrl).then(r => r.json()).then(json => {
+      this.setState(prevState => {
+        const state = { ...prevState };
+        state.config = json;
+        return state;
+      });
+    });
+
+    fetch(url, { signal: this.registrationController.signal }).then(response => {
       return response.json();
     }).then(json => {
       const results = json as Registration.IRegistrationIndex;
@@ -155,11 +168,11 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
         if (currentItem.catalogEntry.hasReadme) {
           const readmeUrl = `/v3/package/${this.id}/${currentItem.catalogEntry.version}/readme`;
 
-          fetch(readmeUrl, {signal: this.readmeController.signal}).then(response => {
+          fetch(readmeUrl, { signal: this.readmeController.signal }).then(response => {
             return response.text();
           }).then(result => {
             this.setState(prevState => {
-              const state = {...prevState};
+              const state = { ...prevState };
               const markdown = this.parser.parse(result);
 
               state.package!.readme = this.htmlRenderer.render(markdown);
@@ -169,15 +182,15 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
           });
         }
       }
-    // tslint:disable-next-line:no-console
+      // tslint:disable-next-line:no-console
     }).catch((e) => console.log("Failed to load package.", e));
   }
 
   public render() {
     if (!this.state.package) {
-        return (
-          <div>...</div>
-        );
+      return (
+        <div>...</div>
+      );
     } else {
       return (
         <div className="row display-package">
@@ -197,6 +210,10 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
 
             {/* TODO: Fix this */}
             <div className="package-description" dangerouslySetInnerHTML={{ __html: this.state.package.readme }} />
+
+            {(this.state.config && this.state.config.exampleServiceUrl) &&
+              <Examples content="Test" packageName={this.state.package.id} packageVersion={this.state.package.version} serviceUrl={this.state.config.exampleServiceUrl} />
+            }
 
             <Dependents packageId={this.id} />
             <Dependencies dependencyGroups={this.state.package.dependencyGroups} />
@@ -263,7 +280,7 @@ class DisplayPackage extends React.Component<IDisplayPackageProps, IDisplayPacka
   }
 
   private dateToString(date: Date): string {
-    return `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   }
 }
 
